@@ -53,7 +53,7 @@ let estadoAtual = estados.PRONTO;
 
 // === Cutscenes (sequências de imagens entre fases) ===
 let cutsceneIndex = 0;
-const imagensCutsceneInicio = ["img/cutscene1.png", "img/cutscene2.png", "img/cutscene3.png"];
+const imagensCutsceneInicio = ["img/cutscene1.png", "img/cutscene2.png", "img/cutscene3.png", "img/cutscene6.png"];
 const imagensCutsceneBoss = ["img/cutscene4.png"];
 const imagensCutsceneVictoria = ["img/cutscene5.png"];
 
