@@ -55,7 +55,7 @@ let estadoAtual = estados.PRONTO;
 let cutsceneIndex = 0;
 const imagensCutsceneInicio = ["img/cutscene1.png", "img/cutscene2.png", "img/cutscene3.png", "img/cutscene6.png"];
 const imagensCutsceneBoss = ["img/cutscene4.png"];
-const imagensCutsceneVictoria = ["img/cutscene5.png"];
+const imagensCutsceneVictoria = ["img/cutscene7.png"];
 
 // === Recursos de áudio e imagem ===
 const musicaFundo = new Audio("music/musicajogo.mp3");
@@ -169,6 +169,7 @@ function gerenciarMusica() {
     estadoAtual === estados.CUTSCENE_VITORIA
   ) {
     if (musicaBoss.paused) {
+      musicaBoss.currenTime = 0;
       musicaBoss.play();
       musicaFundo.pause();
       musicaFundo.currentTime = 0;
@@ -276,35 +277,59 @@ canvas.addEventListener("click", (e) => {
       carregarImagemCutscene(imagensCutsceneInicio[cutsceneIndex]);
       musicaFundo.pause();
       musicaFundo.currentTime = 0;
+      suspenseFundo.currentTime = 0;
+      suspenseFundo.play();
+
+      cutscenePodeAvancar = false;
+      setTimeout(() => {
+        cutscenePodeAvancar = true;
+      }, 1500);
       return;
     }
   }
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "F9") { // Verifica se a tecla pressionada é F9
-      // Força o jogo a ir direto para a cutscene da boss fight
-      estadoAtual = estados.CUTSCENE_BOSS;
-      cutsceneIndex = 0; // Reinicia o índice da cutscene para a do boss
-      cutscenePodeAvancar = false; // Garante que não avança imediatamente se a cutscene do boss tiver um delay
 
-      // Carrega a primeira imagem da cutscene do boss
-      // Assumindo que imagensCutsceneBoss tem pelo menos uma imagem
-      carregarImagemCutscene(imagensCutsceneBoss[cutsceneIndex]);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "F9") {
+    estadoAtual = estados.CUTSCENE_BOSS;
+    cutsceneIndex = 0;
+    cutscenePodeAvancar = false;
+    carregarImagemCutscene(imagensCutsceneBoss[cutsceneIndex]);
+    gravidadeSuspensa = true;
+    setTimeout(() => {
+      gravidadeSuspensa = false;
+      cutscenePodeAvancar = true;
+    }, 500);
+    jamal.reiniciar();
+    tubos.reiniciar();
+    chefao.reiniciar();
+    pararMusicaFundo();
+  }
+});
 
-      // Suspende temporariamente a gravidade como na transição normal
-      // Isso é importante para Jamal não cair durante a transição
-      gravidadeSuspensa = true;
-      setTimeout(() => {
-        gravidadeSuspensa = false;
-        cutscenePodeAvancar = true; // Permite avançar a cutscene após o delay
-      }, 500); // Meio segundo de gravidade suspensa, ajuste se necessário
-
-      // Reinicia elementos do jogo para evitar bugs na transição
-      jamal.reiniciar();
-      tubos.reiniciar(); // Limpa os tubos existentes
-      chefao.reiniciar(); // Garante que o chefe comece do zero
-      pararMusicaFundo(); // Para a música dos tubos se estiver tocando
+document.addEventListener("keydown", (e) => {
+  if (e.key === "e" || e.key === "E") {
+    if (especialDisponivel && estadoAtual === estados.CHEFAO) {
+      ativarAtaqueEspecial();
     }
-  });
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (
+      estadoAtual === estados.TUBOS ||
+      estadoAtual === estados.CHEFAO
+    ) {
+      estadoAtual = estados.PAUSADO;
+      musicaFundo.pause();
+      musicaBoss.pause();
+    } else if (estadoAtual === estados.PAUSADO) {
+      estadoAtual = tubosPassados >= TUBOS_ATE_CHEFAO ? estados.CHEFAO : estados.TUBOS;
+      gerenciarMusica();
+    }
+  }
+});
+
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "e" || e.key === "E") {
@@ -485,6 +510,7 @@ const chefao = {
         estadoAtual = estados.VITORIA;
         cutsceneIndex = 0;
         carregarImagemCutscene(imagensCutsceneVictoria[0]);
+        gerenciarMusica();
       }
       return; // pausa todas as atualizações enquanto a explosão ocorre
     }
@@ -850,7 +876,9 @@ botaoReiniciar.addEventListener("click", () => {
   chefao.reiniciar();
   estadoAtual = estados.PRONTO;
   quadros = 0;
-  pararMusicaFundo();
+
+  musicaBoss.pause();
+  musicaBoss.currentTime = 0;
 
   if (!jogoRodando) {
     jogoRodando = true;
