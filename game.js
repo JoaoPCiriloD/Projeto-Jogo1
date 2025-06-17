@@ -160,7 +160,6 @@ function gerenciarMusica() {
   if (estadoAtual === estados.TUBOS) {
     if (musicaFundo.paused) {
       musicaFundo.play();
-      musicaBoss.pause();
       musicaBoss.currentTime = 0;
     }
   } else if (
@@ -175,7 +174,6 @@ function gerenciarMusica() {
     }
   } else {
     musicaFundo.pause();
-    musicaBoss.pause();
   }
 }
 
@@ -219,6 +217,12 @@ function lidarComPulo() {
     cutsceneIndex++;
     if (cutsceneIndex >= imagensCutsceneBoss.length) {
       estadoAtual = estados.CHEFAO;
+      musicaFundo.pause();
+      musicaFundo.currentTime = 0;
+      suspenseFundo.pause();
+      suspenseFundo.currentTime = 0;
+      musicaBoss.currentTime = 0;
+      musicaBoss.play();
       musicaFundo.pause();
       musicaFundo.currentTime = 0;
       suspenseFundo.pause();
@@ -485,6 +489,10 @@ const chefao = {
         estadoAtual = estados.VITORIA;
         cutsceneIndex = 0;
         carregarImagemCutscene(imagensCutsceneVictoria[0]);
+        if (musicaBoss.paused) {
+        musicaBoss.currentTime = 0;
+        musicaBoss.play();
+    }
       }
       return; // pausa todas as atualizações enquanto a explosão ocorre
     }
@@ -736,6 +744,11 @@ function desenharJogo() {
     botaoReiniciar.style.display = "block";
     musicaFundo.pause();
     musicaFundo.currentTime = 0;
+
+    if (estadoAtual === estados.DERROTA) {
+    musicaBoss.pause();
+    musicaBoss.currentTime = 0;
+  }
 
     if (estadoAtual === estados.DERROTA && mortePorChefao) {
       contexto.drawImage(imagemTelaMorteBoss, 0, 0, canvas.width, canvas.height);
