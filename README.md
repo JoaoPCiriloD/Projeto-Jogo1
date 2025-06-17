@@ -22,7 +22,7 @@ Cada tubo equivale a 1 ponto.
 A gravidade é implacável!
 
 🔥 Fase 2 – Batalha contra o Boss
-<div align="center"> <img src="img/tutorial-boss.png" alt="Fase do boss" width="500"/> </div>
+<div align="center"> <img src="img/tutorial-boss.png alt="Fase do boss" width="500"/> </div>
 O boss se move verticalmente e lança bandeiras contra você.
 
 Se você for atingido, perde vida.
